@@ -1,14 +1,20 @@
 import get from "lodash/get";
-import {
-  loginWithEmailAndPassword,
-  googleLoginWithCredentialManager,
-  facebookLogin
-} from "./mobile/signIn/SocialLogins.js";
 
 const GOOGLE_SIGNIN = "https://accounts.google.com";
 const FACEBOOK_LOGIN = "https://www.facebook.com";
 
-class CredManager {
+export default class CredManager {
+
+  contructor(loginWithEmailAndPassword, facebookLogin, googleLogin, logInCheck) {
+    // Methods to call once credentials are retrieved.
+    this.loginWithEmailAndPassword = loginWithEmailAndPassword;
+    this.facebookLogin = facebookLogin;
+    this.googleLogin = googleLogin;
+
+    // Boolean fn that tells wether user is signed in or not.
+    this.isLoggedIn = logInCheck;
+  }
+
   isNewApiAvailable() {
     if (navigator.credentials && navigator.credentials.preventSilentAccess) {
       return true;
@@ -16,15 +22,7 @@ class CredManager {
     return false;
   }
 
-  isLoggedIn() {
-    if (get(window, "MYNTRA.myx.session.login")) {
-      return true;
-    }
-    return false;
-  }
-
   requestUserCredentials(mode = "silent") {
-    console.error("CM: Requesting user credentials");
     if (this.isNewApiAvailable() && !this.isLoggedIn()) {
       return navigator.credentials.get({
         password: true,
@@ -59,26 +57,20 @@ class CredManager {
     if (cred && cred.type) {
       switch (cred.type) {
         case "password": {
-          console.log("CredManagement - Found PasswordCred", cred);
           // make a request to sign in user
-          ga("send", "event", "auto-signin", `signin-password-${mode}`);
-          loginWithEmailAndPassword(cred.id, cred.password, mode);
+          loginWithEmailAndPassword(cred.id, cred.password);
           break;
         }
         case "federated": {
           // make a request to social logins
-          console.log("Found FederatedCredential", cred);
           switch (cred.provider) {
             case GOOGLE_SIGNIN: {
               let id = cred.id;
-              ga("send", "event", "auto-signin", `signin-google-${mode}`);
-              googleLoginWithCredentialManager(cred.id, mode);
+              googleLoginWithCredentialManager(cred.id);
               break;
             }
             case FACEBOOK_LOGIN: {
-              console.error("CM: Facebook federated login", cred);
-              ga("send", "event", "auto-signin", `signin-fb-${mode}`);
-              facebookLogin(mode);
+              facebookLogin(cred.id);
               break;
             }
             default: {
@@ -99,17 +91,9 @@ class CredManager {
 
   storeFederatedCredentials(id, name, logo = "", provider) {
     let providerID;
-    console.error(
-      "Store federated credentials called, parameters = ",
-      id,
-      name,
-      logo,
-      provider
-    );
     if (provider === "google") {
       providerID = GOOGLE_SIGNIN;
-    }
-    if (provider === "facebook") {
+    } else if (provider === "facebook") {
       providerID = FACEBOOK_LOGIN;
     }
 
@@ -128,6 +112,3 @@ class CredManager {
     }
   }
 }
-
-export default new CredManager();
-
