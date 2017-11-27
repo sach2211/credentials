@@ -1,0 +1,23 @@
+{
+  "name": "credentials",
+  "version": "0.0.1",
+  "description": "An implemntation to save user accounts using Credential Management API. Read More at - https://developer.mozilla.org/en-US/docs/Web/API/Credential_Management_API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sach2211/credentials.git"
+  },
+  "keywords": [
+    "credentials",
+    "credential-management"
+  ],
+  "author": "sach2211",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sach2211/credentials/issues"
+  },
+  "homepage": "https://github.com/sach2211/credentials#readme"
+}
